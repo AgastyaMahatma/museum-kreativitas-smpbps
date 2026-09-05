@@ -388,7 +388,7 @@ document.addEventListener('DOMContentLoaded', () => {
     e.preventDefault();
     loginForm.style.display = 'none';
     signupForm.style.display = 'block';
-    authTitle.innerText = 'Request Artist Access';
+    authTitle.innerText = 'Create Account';
   });
 
   switchToLogin.addEventListener('click', (e) => {

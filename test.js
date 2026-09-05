@@ -235,6 +235,11 @@ const runTests = async () => {
       throw new Error('Owner failed to delete artwork!');
     }
 
+    // 10. Clean up temporary test user
+    if (uniqueSignupData?.user?.id) {
+      await db.run('DELETE FROM users WHERE id = ?', [uniqueSignupData.user.id]);
+    }
+
     console.log('\n--- All Supabase & Bcrypt Integration Tests Passed Successfully! ---');
   } catch (error) {
     console.error('\n❌ Test Failure:', error.message);
