@@ -437,7 +437,7 @@ document.addEventListener('DOMContentLoaded', () => {
       authModal.classList.remove('active');
     } else {
       navActions.innerHTML = `
-        <button class="btn btn-secondary" id="openAuthBtn">Artist Portal</button>
+        <button class="btn btn-secondary" id="openAuthBtn">Login / Sign Up</button>
       `;
       document.getElementById('openAuthBtn').addEventListener('click', () => {
         authModal.classList.add('active');
