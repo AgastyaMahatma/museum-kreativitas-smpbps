@@ -171,8 +171,74 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // --- Like Event Handler ---
+  // --- Like Event Handler (Optimistic UI Update) ---
+  const pendingLikeRequests = new Set();
+
   async function handleLike(artworkId, buttonEl) {
+    if (pendingLikeRequests.has(artworkId)) return;
+    pendingLikeRequests.add(artworkId);
+
+    const artwork = artworks.find(art => art.id === artworkId);
+    
+    // 1. Determine current state
+    const currentlyLiked = artwork ? artwork.liked : (buttonEl ? buttonEl.classList.contains('liked') : false);
+    const prevCount = artwork ? artwork.likes_count : (buttonEl && buttonEl.nextElementSibling ? (parseInt(buttonEl.nextElementSibling.innerText, 10) || 0) : 0);
+
+    // 2. Compute optimistic target state
+    const nextLiked = !currentlyLiked;
+    const nextCount = Math.max(0, prevCount + (nextLiked ? 1 : -1));
+
+    // 3. Optimistically update local data model
+    if (artwork) {
+      artwork.liked = nextLiked;
+      artwork.likes_count = nextCount;
+    }
+
+    // Helper to update both grid card and detail modal elements instantly
+    const updateUIState = (isLiked, count) => {
+      // Update target button passed to function
+      if (buttonEl) {
+        if (isLiked) buttonEl.classList.add('liked');
+        else buttonEl.classList.remove('liked');
+
+        const countEl = buttonEl.nextElementSibling;
+        if (countEl && countEl.classList.contains('likes-count')) {
+          countEl.innerText = `${count} likes`;
+        }
+      }
+
+      // Update grid card element if exists
+      const gridCardBtn = galleryGrid.querySelector(`.like-button[data-id="${artworkId}"]`);
+      if (gridCardBtn) {
+        if (isLiked) gridCardBtn.classList.add('liked');
+        else gridCardBtn.classList.remove('liked');
+
+        const gridCountEl = gridCardBtn.nextElementSibling;
+        if (gridCountEl) gridCountEl.innerText = `${count} likes`;
+      }
+
+      // Update detail modal elements if active
+      const detailLikeBtn = document.getElementById('detailLikeBtn');
+      const detailLikeCount = document.getElementById('detailLikeCount');
+      if (detailLikeBtn) {
+        if (isLiked) detailLikeBtn.classList.add('liked');
+        else detailLikeBtn.classList.remove('liked');
+      }
+      if (detailLikeCount) {
+        detailLikeCount.innerText = `${count} likes`;
+      }
+    };
+
+    // 4. Apply UI update IMMEDIATELY (0ms latency for user feedback)
+    updateUIState(nextLiked, nextCount);
+
+    if (nextLiked) {
+      showToast('Creations liked! Added to device votes.');
+    } else {
+      showToast('Like removed.');
+    }
+
+    // 5. Fire network request asynchronously in background
     try {
       const response = await fetch(`/api/artworks/${artworkId}/like`, {
         method: 'POST',
@@ -183,25 +249,23 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!response.ok) throw new Error('Like request failed');
       const result = await response.json();
 
-      const artwork = artworks.find(art => art.id === artworkId);
+      // Synchronize exact values from server
       if (artwork) {
         artwork.liked = result.liked;
         artwork.likes_count = result.likes_count;
       }
-
-      const countEl = buttonEl.nextElementSibling;
-      countEl.innerText = `${result.likes_count} likes`;
-
-      if (result.liked) {
-        buttonEl.classList.add('liked');
-        showToast('Creations liked! Added to device votes.');
-      } else {
-        buttonEl.classList.remove('liked');
-        showToast('Like removed.');
-      }
+      updateUIState(result.liked, result.likes_count);
     } catch (err) {
-      console.error(err);
-      showToast('Action failed. Please try again.');
+      console.error('Optimistic like error:', err);
+      // Revert optimistic update on failure
+      if (artwork) {
+        artwork.liked = currentlyLiked;
+        artwork.likes_count = prevCount;
+      }
+      updateUIState(currentlyLiked, prevCount);
+      showToast('Action failed. Reverting like state.');
+    } finally {
+      pendingLikeRequests.delete(artworkId);
     }
   }
 
@@ -291,13 +355,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     const detailLikeBtn = detailModal.querySelector('#detailLikeBtn');
-    detailLikeBtn.addEventListener('click', async () => {
-      await handleLike(artwork.id, detailLikeBtn);
-      const updatedArtwork = artworks.find(art => art.id === artwork.id);
-      if (updatedArtwork) {
-        document.getElementById('detailLikeCount').innerText = `${updatedArtwork.likes_count} likes`;
-      }
-      renderGallery();
+    detailLikeBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      handleLike(artwork.id, detailLikeBtn);
     });
 
     if (isOwnerOrAdmin) {
