@@ -74,21 +74,20 @@ const createArtwork = async (req, res) => {
   const artist_id = req.user.id;
 
   if (req.file) {
-    media_url = `/uploads/${req.file.filename}`;
+    if (req.file.buffer) {
+      const b64 = req.file.buffer.toString('base64');
+      media_url = `data:${req.file.mimetype};base64,${b64}`;
+    } else if (req.file.filename) {
+      media_url = `/uploads/${req.file.filename}`;
+    }
   }
 
   if (!title || !art_type || !media_url) {
-    if (req.file) {
-      await deleteLocalFile(`/uploads/${req.file.filename}`);
-    }
     return res.status(400).json({ error: 'title, art_type, and media_url (or file upload) are required' });
   }
 
   const validTypes = ['Digital Art', 'Manual Art (Photoed)', 'Video Art', 'Photography'];
   if (!validTypes.includes(art_type)) {
-    if (req.file) {
-      await deleteLocalFile(`/uploads/${req.file.filename}`);
-    }
     return res.status(400).json({ error: `Invalid art_type. Must be one of: ${validTypes.join(', ')}` });
   }
 
@@ -109,9 +108,6 @@ const createArtwork = async (req, res) => {
     });
   } catch (error) {
     console.error('Error creating artwork:', error);
-    if (req.file) {
-      await deleteLocalFile(`/uploads/${req.file.filename}`);
-    }
     return res.status(500).json({ error: 'Internal server error' });
   }
 };
@@ -124,7 +120,12 @@ const updateArtwork = async (req, res) => {
   let media_url = req.body.media_url;
 
   if (req.file) {
-    media_url = `/uploads/${req.file.filename}`;
+    if (req.file.buffer) {
+      const b64 = req.file.buffer.toString('base64');
+      media_url = `data:${req.file.mimetype};base64,${b64}`;
+    } else if (req.file.filename) {
+      media_url = `/uploads/${req.file.filename}`;
+    }
   }
 
   if (!title || !art_type) {

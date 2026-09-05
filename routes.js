@@ -7,16 +7,8 @@ const artworkController = require('./artworkController');
 const { verifyToken, verifyAdmin } = require('./authMiddleware');
 const adminController = require('./adminController');
 
-// Multer storage configuration
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, 'uploads'));
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
-  }
-});
+// Multer memory storage configuration for Serverless / Vercel compatibility
+const storage = multer.memoryStorage();
 
 // File filter (restrict to JPEG, PNG, WEBP, MP4)
 const fileFilter = (req, file, cb) => {

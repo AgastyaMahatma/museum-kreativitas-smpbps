@@ -111,13 +111,20 @@ document.addEventListener('DOMContentLoaded', () => {
       const card = document.createElement('div');
       card.className = 'gallery-item';
       
+      let mediaSrc = art.media_url || '';
+      if (mediaSrc && !mediaSrc.startsWith('http') && !mediaSrc.startsWith('data:')) {
+        if (!mediaSrc.startsWith('/')) {
+          mediaSrc = '/' + mediaSrc;
+        }
+      }
+
       const isVideo = art.art_type === 'Video Art';
       const mediaHtml = isVideo
-        ? `<video src="${art.media_url}" loop muted playsinline></video>
+        ? `<video src="${escapeHtml(mediaSrc)}" loop muted playsinline></video>
            <div class="video-indicator">
              <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
            </div>`
-        : `<img src="${art.media_url}" alt="${art.title}" loading="lazy">`;
+        : `<img src="${escapeHtml(mediaSrc)}" alt="${escapeHtml(art.title)}" loading="lazy" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800';">`;
 
       card.innerHTML = `
         <div class="artwork-media-container">
