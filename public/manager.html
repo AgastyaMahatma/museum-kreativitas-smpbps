@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Artist Portfolio Manager | Student Art Museum</title>
+  
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <header>
+    <div class="nav-container">
+      <a href="/" class="logo-wrapper">
+        <div class="logo-icon">M</div>
+        <span class="logo-text">Kreativitas</span>
+      </a>
+      <div class="nav-actions" id="navActions">
+        <!-- Will be dynamically populated by manager.js -->
+        <span style="color: var(--clr-lavender);">Checking artist session...</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Portfolio Header Section -->
+  <section class="hero" style="padding-bottom: 2rem;">
+    <h1>Artist <span>Portal</span></h1>
+    <p>Manage your creative submissions, update media files, and track your artwork visibility status.</p>
+  </section>
+
+  <!-- Gallery Manager Section -->
+  <main class="gallery-section">
+    <div class="dashboard-header" style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <h2 style="font-family: var(--font-header); font-size: 1.8rem; color: var(--clr-peach-cream);">Your Portfolio</h2>
+      <a href="index.html" class="btn btn-secondary">← Back to Gallery</a>
+    </div>
+    <div class="gallery-grid" id="managementGrid">
+      <div class="empty-state">
+        <p>Loading your portfolio submissions...</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- MODAL: Upload Artwork -->
+  <div class="modal-backdrop" id="uploadModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Publish Artwork</h2>
+        <button class="close-modal" id="closeUploadBtn">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="uploadForm" enctype="multipart/form-data">
+          <div class="form-group">
+            <label for="artTitle">Artwork Title</label>
+            <input type="text" id="artTitle" class="form-input" placeholder="e.g. Echoes of Midnight" required>
+          </div>
+          <div class="form-group">
+            <label for="artType">Medium</label>
+            <select id="artType" class="form-input" style="appearance: none; background-image: url('data:image/svg+xml;utf8,<svg fill=%22%23F7E5DA%22 height=%2224%22 viewBox=%220 0 24 24%22 width=%2224%22 xmlns=%22http://www.w3.org/2000/svg%22><path d=%22M7 10l5 5 5-5z%22/></svg>'); background-repeat: no-repeat; background-position: right 10px center;" required>
+              <option value="Digital Art">Digital Art</option>
+              <option value="Manual Art (Photoed)">Manual Art (Photoed)</option>
+              <option value="Video Art">Video Art</option>
+              <option value="Photography">Photography</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="uploadSourceType">Media Source</label>
+            <select id="uploadSourceType" class="form-input" style="appearance: none; background-image: url('data:image/svg+xml;utf8,<svg fill=%22%23F7E5DA%22 height=%2224%22 viewBox=%220 0 24 24%22 width=%2224%22 xmlns=%22http://www.w3.org/2000/svg%22><path d=%22M7 10l5 5 5-5z%22/></svg>'); background-repeat: no-repeat; background-position: right 10px center;">
+              <option value="file">Local File Upload</option>
+              <option value="url">External Web Link</option>
+            </select>
+          </div>
+          <div class="form-group" id="fileUploadGroup">
+            <label for="mediaFile">Select Image or Video File</label>
+            <input type="file" id="mediaFile" name="mediaFile" class="form-input" accept="image/*,video/mp4" required>
+            <small style="color: var(--clr-lavender); font-size: 0.75rem; margin-top: 0.25rem; display: block;">Supported: JPEG, PNG, WEBP, MP4 (Max 50MB).</small>
+          </div>
+          <div class="form-group" id="urlUploadGroup" style="display: none;">
+            <label for="mediaUrl">Media Source URL</label>
+            <input type="url" id="mediaUrl" class="form-input" placeholder="https://images.unsplash.com/...">
+          </div>
+          <div class="form-group">
+            <label for="artDescription">Artwork Description</label>
+            <textarea id="artDescription" class="form-input" rows="3" placeholder="Describe your creation, techniques, and inspiration..."></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 1.5rem;">Publish to Gallery</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Edit Artwork -->
+  <div class="modal-backdrop" id="editModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Edit Artwork Submission</h2>
+        <button class="close-modal" id="closeEditBtn">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="editForm" enctype="multipart/form-data">
+          <input type="hidden" id="editArtId">
+          <div class="form-group">
+            <label for="editArtTitle">Artwork Title</label>
+            <input type="text" id="editArtTitle" class="form-input" placeholder="e.g. Echoes of Midnight" required>
+          </div>
+          <div class="form-group">
+            <label for="editArtType">Medium</label>
+            <select id="editArtType" class="form-input" style="appearance: none; background-image: url('data:image/svg+xml;utf8,<svg fill=%22%23F7E5DA%22 height=%2224%22 viewBox=%220 0 24 24%22 width=%2224%22 xmlns=%22http://www.w3.org/2000/svg%22><path d=%22M7 10l5 5 5-5z%22/></svg>'); background-repeat: no-repeat; background-position: right 10px center;" required>
+              <option value="Digital Art">Digital Art</option>
+              <option value="Manual Art (Photoed)">Manual Art (Photoed)</option>
+              <option value="Video Art">Video Art</option>
+              <option value="Photography">Photography</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="editArtDescription">Artwork Description</label>
+            <textarea id="editArtDescription" class="form-input" rows="3" placeholder="Describe your creation..."></textarea>
+          </div>
+          <div class="form-group">
+            <label for="editSourceType">Replace Media (Optional)</label>
+            <select id="editSourceType" class="form-input" style="appearance: none; background-image: url('data:image/svg+xml;utf8,<svg fill=%22%23F7E5DA%22 height=%2224%22 viewBox=%220 0 24 24%22 width=%2224%22 xmlns=%22http://www.w3.org/2000/svg%22><path d=%22M7 10l5 5 5-5z%22/></svg>'); background-repeat: no-repeat; background-position: right 10px center;">
+              <option value="none">Keep Existing Media</option>
+              <option value="file">Upload New File</option>
+              <option value="url">Enter New Web Link</option>
+            </select>
+          </div>
+          <div class="form-group" id="editFileGroup" style="display: none;">
+            <label for="editMediaFile">Select New Image/Video File</label>
+            <input type="file" id="editMediaFile" name="mediaFile" class="form-input" accept="image/*,video/mp4">
+            <small style="color: var(--clr-lavender); font-size: 0.75rem; margin-top: 0.25rem; display: block;">Supported: JPEG, PNG, WEBP, MP4 (Max 50MB).</small>
+          </div>
+          <div class="form-group" id="editUrlGroup" style="display: none;">
+            <label for="editMediaUrl">New Media Source URL</label>
+            <input type="url" id="editMediaUrl" class="form-input" placeholder="https://images.unsplash.com/...">
+          </div>
+          <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 1.5rem;">Save Changes</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Delete Confirmation -->
+  <div class="modal-backdrop" id="deleteModal">
+    <div class="modal-content" style="max-width: 420px; text-align: center; padding: 2rem;">
+      <div style="color: var(--clr-coral); margin-bottom: 1rem;">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin: 0 auto;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+      </div>
+      <h3 style="font-family: var(--font-header); font-size: 1.5rem; margin-bottom: 0.5rem; color: var(--clr-peach-cream);">Delete Artwork?</h3>
+      <p style="color: var(--clr-lavender); font-size: 0.9rem; margin-bottom: 1.5rem; line-height: 1.5;">This action cannot be undone. The artwork and all accumulated likes/guest votes will be permanently deleted.</p>
+      <div style="display: flex; gap: 1rem; justify-content: center;">
+        <button class="btn btn-secondary" id="cancelDeleteBtn" style="flex: 1;">Cancel</button>
+        <button class="btn btn-primary" id="confirmDeleteBtn" style="flex: 1; background: var(--clr-coral); border-color: var(--clr-coral); color: var(--clr-bg);">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST: Notifications -->
+  <div class="toast" id="toastNotification">
+    <div class="toast-icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+    </div>
+    <span id="toastMessage">Success notification message</span>
+  </div>
+
+  <!-- Footer -->
+  <footer class="museum-footer">
+    <div class="footer-container">
+      <p class="footer-credit">Created by <span>Agastya Mahatma</span></p>
+      <p class="footer-team">Managed & Operated by <span>Gung Wah</span>, <span>Kirana Aquilla</span>, <span>Dayu Wika</span>, and <span>Omang Alia</span></p>
+      <p class="footer-copyright">&copy; 2026 Student Art Museum. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Javascript -->
+  <script src="manager.js"></script>
+</body>
+</html>

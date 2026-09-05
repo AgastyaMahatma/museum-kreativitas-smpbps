@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Art Museum | Staggered Digital & Video Gallery</title>
+  
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Explore a curated, high-contrast digital gallery of student art, photography, video art, and digital masterpieces. Created by tomorrow's creative minds.">
+  <meta name="keywords" content="student art, digital art, photography, video art, museum gallery, responsive grid">
+  
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Dynamic Header / Navigation -->
+  <header>
+    <div class="nav-container">
+      <a href="/" class="logo-wrapper" id="navLogo">
+        <div class="logo-icon">M</div>
+        <span class="logo-text">Kreativitas</span>
+      </a>
+      <div class="nav-actions" id="navActions">
+        <!-- Will be dynamically populated by index.js based on auth state -->
+        <button class="btn btn-secondary" id="openAuthBtn">Artist Portal</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Intro Section -->
+  <section class="hero">
+    <h1>Student <span>Art Museum</span></h1>
+    <p>A minimalist exhibition space celebrating photography, digital art, hand-drawn creations, and moving images from our student community.</p>
+  </section>
+
+  <!-- Control & Filter Panel -->
+  <div class="controls-container">
+    <div class="filters-wrapper" id="filtersContainer">
+      <button class="filter-btn active" data-type="All">All Creations</button>
+      <button class="filter-btn" data-type="Digital Art">Digital Art</button>
+      <button class="filter-btn" data-type="Manual Art (Photoed)">Manual Art</button>
+      <button class="filter-btn" data-type="Video Art">Video Art</button>
+      <button class="filter-btn" data-type="Photography">Photography</button>
+    </div>
+    <div class="dropdown-filter-wrapper">
+      <select id="categoryDropdown" class="form-input category-select" style="max-width: 250px; appearance: none; background-image: url('data:image/svg+xml;utf8,<svg fill=%22%23F7E5DA%22 height=%2224%22 viewBox=%220 0 24 24%22 width=%2224%22 xmlns=%22http://www.w3.org/2000/svg%22><path d=%22M7 10l5 5 5-5z%22/></svg>'); background-repeat: no-repeat; background-position: right 10px center; padding-right: 35px;">
+        <option value="All">All Creations</option>
+        <option value="Digital Art">Digital Art</option>
+        <option value="Manual Art (Photoed)">Manual Art (Photoed)</option>
+        <option value="Video Art">Video Art</option>
+        <option value="Photography">Photography</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Responsive Masonry Gallery -->
+  <main class="gallery-section" id="exhibitionSection">
+    <div class="gallery-grid" id="galleryGrid">
+      <!-- Artworks will be loaded dynamically here -->
+      <div class="empty-state" id="galleryLoader">
+        <p>Loading the collection...</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- MODAL: Authentication (Login / Signup) -->
+  <div class="modal-backdrop" id="authModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="authTitle">Artist Portal Login</h2>
+        <button class="close-modal" id="closeAuthBtn">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- Login Form -->
+        <form id="loginForm">
+          <div class="form-group">
+            <label for="loginEmail">Email Address</label>
+            <input type="email" id="loginEmail" class="form-input" placeholder="artist@museum.id" required>
+            <div class="form-error" id="loginEmailError"></div>
+          </div>
+          <div class="form-group">
+            <label for="loginPassword">Password</label>
+            <input type="password" id="loginPassword" class="form-input" placeholder="••••••••" required>
+            <div class="form-error" id="loginPasswordError"></div>
+          </div>
+          <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem;">
+            <input type="checkbox" id="loginRememberMe" style="accent-color: var(--clr-coral); cursor: pointer; width: 16px; height: 16px;">
+            <label for="loginRememberMe" style="margin-bottom: 0; text-transform: none; font-size: 0.85rem; color: var(--clr-peach-cream); cursor: pointer;">Remember me</label>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 1rem;">Enter Portal</button>
+          <div class="form-switch">
+            Don't have an account? <a href="#" id="switchToSignup">Request Access</a>
+          </div>
+        </form>
+
+        <!-- Signup Form (Hidden initially) -->
+        <form id="signupForm" style="display: none;">
+          <div class="form-group">
+            <label for="signupName">Artist Name / Username</label>
+            <input type="text" id="signupName" class="form-input" placeholder="Agastya Mahatma" required>
+            <div class="form-error" id="signupNameError"></div>
+          </div>
+          <div class="form-group">
+            <label for="signupEmail">Email Address</label>
+            <input type="email" id="signupEmail" class="form-input" placeholder="artist@museum.id" required>
+            <div class="form-error" id="signupEmailError"></div>
+          </div>
+          <div class="form-group">
+            <label for="signupPassword">Password</label>
+            <input type="password" id="signupPassword" class="form-input" placeholder="••••••••" required>
+            <div class="form-error" id="signupPasswordError"></div>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 1rem;">Register Account</button>
+          <div class="form-switch">
+            Already registered? <a href="#" id="switchToLogin">Log In</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Artwork Detailed Fullscreen View -->
+  <div class="modal-backdrop" id="detailModal">
+    <div class="modal-content detail-modal-content" id="detailModalContent">
+      <!-- Populated dynamically by index.js -->
+    </div>
+  </div>
+
+  <!-- TOAST: Notifications -->
+  <div class="toast" id="toastNotification">
+    <div class="toast-icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+    </div>
+    <span id="toastMessage">Success notification message</span>
+  </div>
+
+  <!-- Footer -->
+  <footer class="museum-footer">
+    <div class="footer-container">
+      <p class="footer-credit">Created by <span>Agastya Mahatma</span></p>
+      <p class="footer-team">Managed & Operated by <span>Gung Wah</span>, <span>Kirana Aquilla</span>, <span>Dayu Wika</span>, and <span>Omang Alia</span></p>
+      <p class="footer-copyright">&copy; 2026 Student Art Museum. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Javascript -->
+  <script src="index.js"></script>
+</body>
+</html>

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Portal | Student Art Museum</title>
+  
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <header>
+    <div class="nav-container">
+      <a href="/" class="logo-wrapper">
+        <div class="logo-icon">M</div>
+        <span class="logo-text">Kreativitas</span>
+      </a>
+      <div class="nav-actions" id="navActions">
+        <!-- Will be dynamically populated by admin.js -->
+        <span style="color: var(--clr-lavender);">Checking admin session...</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Admin Title Section -->
+  <section class="hero" style="padding-bottom: 2rem;">
+    <h1>Admin <span>Portal</span></h1>
+    <p>Manage registered student artists and moderate all uploaded creations across the museum.</p>
+  </section>
+
+  <!-- Admin Portal Section -->
+  <main class="gallery-section">
+    <div class="dashboard-header" style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <h2 style="font-family: var(--font-header); font-size: 1.8rem; color: var(--clr-peach-cream);">Administration Control</h2>
+      <a href="index.html" class="btn btn-secondary">← Back to Exhibition</a>
+    </div>
+    
+    <!-- Admin Tabs -->
+    <div class="admin-tabs" style="display: flex; gap: 1rem; border-bottom: 1px solid var(--clr-border); margin-bottom: 2rem; padding-bottom: 0.5rem;">
+      <button class="filter-btn active" id="adminTabArtistsBtn">Manage Artists</button>
+      <button class="filter-btn" id="adminTabArtworksBtn">Moderate Artworks</button>
+    </div>
+
+    <!-- Tab 1: Artists List -->
+    <div id="adminArtistsTab" class="admin-tab-content">
+      <div style="overflow-x: auto; background-color: var(--clr-card-bg); border-radius: 12px; border: 1px solid var(--clr-border); padding: 1.5rem;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left; min-width: 600px;">
+          <thead>
+            <tr style="border-bottom: 1px solid var(--clr-border); color: var(--clr-rose-gold);">
+              <th style="padding: 1rem;">Artist Name</th>
+              <th style="padding: 1rem;">Email</th>
+              <th style="padding: 1rem;">Role</th>
+              <th style="padding: 1rem;">Registered</th>
+              <th style="padding: 1rem; text-align: center;">Creations</th>
+              <th style="padding: 1rem; text-align: right;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="adminArtistsTableBody">
+            <tr>
+              <td colspan="6" style="text-align: center; padding: 2rem; color: var(--clr-lavender);">Loading artists...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tab 2: Artworks Moderation -->
+    <div id="adminArtworksTab" class="admin-tab-content" style="display: none;">
+      <div style="overflow-x: auto; background-color: var(--clr-card-bg); border-radius: 12px; border: 1px solid var(--clr-border); padding: 1.5rem;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left; min-width: 800px;">
+          <thead>
+            <tr style="border-bottom: 1px solid var(--clr-border); color: var(--clr-rose-gold);">
+              <th style="padding: 1rem;">Preview</th>
+              <th style="padding: 1rem;">Title</th>
+              <th style="padding: 1rem;">Artist</th>
+              <th style="padding: 1rem;">Medium</th>
+              <th style="padding: 1rem; text-align: center;">Likes</th>
+              <th style="padding: 1rem; text-align: right;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="adminArtworksTableBody">
+            <tr>
+              <td colspan="6" style="text-align: center; padding: 2rem; color: var(--clr-lavender);">Loading artworks...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- MODAL: Admin Edit Artwork -->
+  <div class="modal-backdrop" id="adminEditModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Admin Moderate Artwork</h2>
+        <button class="close-modal" id="closeAdminEditBtn">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="adminEditForm">
+          <input type="hidden" id="adminEditArtId">
+          <div class="form-group">
+            <label for="adminEditArtTitle">Artwork Title</label>
+            <input type="text" id="adminEditArtTitle" class="form-input" required>
+          </div>
+          <div class="form-group">
+            <label for="adminEditArtType">Medium</label>
+            <select id="adminEditArtType" class="form-input" style="appearance: none; background-image: url('data:image/svg+xml;utf8,<svg fill=%22%23F7E5DA%22 height=%2224%22 viewBox=%220 0 24 24%22 width=%2224%22 xmlns=%22http://www.w3.org/2000/svg%22><path d=%22M7 10l5 5 5-5z%22/></svg>'); background-repeat: no-repeat; background-position: right 10px center;" required>
+              <option value="Digital Art">Digital Art</option>
+              <option value="Manual Art (Photoed)">Manual Art (Photoed)</option>
+              <option value="Video Art">Video Art</option>
+              <option value="Photography">Photography</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="adminEditArtDescription">Artwork Description</label>
+            <textarea id="adminEditArtDescription" class="form-input" rows="3"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="adminEditMediaUrl">Media Source URL</label>
+            <input type="url" id="adminEditMediaUrl" class="form-input" required>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 1.5rem;">Save Moderated Changes</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Delete Artwork Confirmation -->
+  <div class="modal-backdrop" id="deleteModal">
+    <div class="modal-content" style="max-width: 420px; text-align: center; padding: 2rem;">
+      <div style="color: var(--clr-coral); margin-bottom: 1rem;">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin: 0 auto;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+      </div>
+      <h3 style="font-family: var(--font-header); font-size: 1.5rem; margin-bottom: 0.5rem; color: var(--clr-peach-cream);">Delete Artwork?</h3>
+      <p style="color: var(--clr-lavender); font-size: 0.9rem; margin-bottom: 1.5rem; line-height: 1.5;">This action will permanently delete the artwork from the museum database. This action is irreversible.</p>
+      <div style="display: flex; gap: 1rem; justify-content: center;">
+        <button class="btn btn-secondary" id="cancelDeleteBtn">Cancel</button>
+        <button class="btn btn-primary" id="confirmDeleteBtn" style="background: var(--clr-coral); border-color: var(--clr-coral); color: var(--clr-bg);">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Admin Delete Artist Confirmation -->
+  <div class="modal-backdrop" id="adminDeleteArtistModal">
+    <div class="modal-content" style="max-width: 420px; text-align: center; padding: 2rem;">
+      <div style="color: var(--clr-coral); margin-bottom: 1rem;">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin: 0 auto;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+      </div>
+      <h3 style="font-family: var(--font-header); font-size: 1.5rem; margin-bottom: 0.5rem; color: var(--clr-peach-cream);">Remove Artist?</h3>
+      <p style="color: var(--clr-lavender); font-size: 0.9rem; margin-bottom: 1.5rem; line-height: 1.5;">This action will permanently delete the artist profile and all of their uploaded creations from the museum. This action is irreversible.</p>
+      <div style="display: flex; gap: 1rem; justify-content: center;">
+        <button class="btn btn-secondary" id="cancelDeleteArtistBtn" style="flex: 1;">Cancel</button>
+        <button class="btn btn-primary" id="confirmDeleteArtistBtn" style="flex: 1; background: var(--clr-coral); border-color: var(--clr-coral); color: var(--clr-bg);">Remove</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST: Notifications -->
+  <div class="toast" id="toastNotification">
+    <div class="toast-icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+    </div>
+    <span id="toastMessage">Success notification message</span>
+  </div>
+
+  <!-- Footer -->
+  <footer class="museum-footer">
+    <div class="footer-container">
+      <p class="footer-credit">Created by <span>Agastya Mahatma</span></p>
+      <p class="footer-team">Managed & Operated by <span>Gung Wah</span>, <span>Kirana Aquilla</span>, <span>Dayu Wika</span>, and <span>Omang Alia</span></p>
+      <p class="footer-copyright">&copy; 2026 Student Art Museum. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Javascript -->
+  <script src="admin.js"></script>
+</body>
+</html>
