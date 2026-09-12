@@ -118,13 +118,28 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
-      const isVideo = art.art_type === 'Video Art';
-      const mediaHtml = isVideo
-        ? `<video src="${escapeHtml(mediaSrc)}" loop muted playsinline></video>
+      const isVideo = art.art_type === 'Video Art' || mediaSrc.endsWith('.mp4') || mediaSrc.startsWith('data:video/');
+      const isPdf = mediaSrc.startsWith('data:application/pdf') || mediaSrc.toLowerCase().includes('.pdf') || (art.art_type === 'Karya Sastra' && (mediaSrc.includes('drive.google.com') || mediaSrc.includes('docs.google.com')));
+
+      let mediaHtml = '';
+      if (isVideo) {
+        mediaHtml = `<video src="${escapeHtml(mediaSrc)}" loop muted playsinline></video>
            <div class="video-indicator">
              <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-           </div>`
-        : `<img src="${escapeHtml(mediaSrc)}" alt="${escapeHtml(art.title)}" loading="lazy" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800';">`;
+           </div>`;
+      } else if (isPdf) {
+        mediaHtml = `<div class="pdf-card-preview">
+           <div class="pdf-icon-badge">
+             <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+           </div>
+           <div class="pdf-preview-text">
+             <span class="pdf-preview-title">${escapeHtml(art.title)}</span>
+             <span class="pdf-preview-hint">📄 Baca Dokumen Sastra (PDF)</span>
+           </div>
+         </div>`;
+      } else {
+        mediaHtml = `<img src="${escapeHtml(mediaSrc)}" alt="${escapeHtml(art.title)}" loading="lazy" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800';">`;
+      }
 
       card.innerHTML = `
         <div class="artwork-media-container">
@@ -294,10 +309,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- Detail Modal Open/Close ---
   function openDetailModal(artwork) {
-    const isVideo = artwork.art_type === 'Video Art';
-    const mediaHtml = isVideo
-      ? `<video src="${artwork.media_url}" controls autoplay loop muted class="detail-video"></video>`
-      : `<img src="${artwork.media_url}" alt="${artwork.title}">`;
+    let mediaSrc = artwork.media_url || '';
+    if (mediaSrc && !mediaSrc.startsWith('http') && !mediaSrc.startsWith('data:')) {
+      if (!mediaSrc.startsWith('/')) {
+        mediaSrc = '/' + mediaSrc;
+      }
+    }
+
+    const isVideo = artwork.art_type === 'Video Art' || mediaSrc.endsWith('.mp4') || mediaSrc.startsWith('data:video/');
+    const isPdf = mediaSrc.startsWith('data:application/pdf') || mediaSrc.toLowerCase().includes('.pdf') || (artwork.art_type === 'Karya Sastra' && (mediaSrc.includes('drive.google.com') || mediaSrc.includes('docs.google.com')));
+
+    let mediaHtml = '';
+    if (isVideo) {
+      mediaHtml = `<video src="${escapeHtml(mediaSrc)}" controls autoplay loop muted class="detail-video"></video>`;
+    } else if (isPdf) {
+      mediaHtml = `<div class="detail-pdf-viewer">
+        <iframe src="${escapeHtml(mediaSrc)}" class="pdf-iframe" title="${escapeHtml(artwork.title)}"></iframe>
+        <div style="margin-top: 0.75rem; text-align: center;">
+          <a href="${escapeHtml(mediaSrc)}" target="_blank" rel="noopener noreferrer" download="${escapeHtml(artwork.title)}.pdf" class="btn btn-primary" style="display: inline-flex; justify-content: center; width: 100%;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            Buka / Unduh Dokumen (PDF)
+          </a>
+        </div>
+      </div>`;
+    } else {
+      mediaHtml = `<img src="${escapeHtml(mediaSrc)}" alt="${escapeHtml(artwork.title)}">`;
+    }
 
     const formattedDate = new Date(artwork.upload_date).toLocaleDateString(undefined, {
       year: 'numeric',

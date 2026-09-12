@@ -1196,3 +1196,95 @@ table tr:hover td {
   margin-top: 0.5rem;
 }
 
+/* PDF & Karya Sastra Card / Viewer Styles */
+.pdf-card-preview {
+  width: 100%;
+  height: 240px;
+  background: linear-gradient(135deg, rgba(79, 76, 75, 0.4), rgba(145, 121, 144, 0.25));
+  border-bottom: 1px solid var(--clr-border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: var(--transition-smooth);
+}
+
+.gallery-item:hover .pdf-card-preview {
+  background: linear-gradient(135deg, rgba(79, 76, 75, 0.6), rgba(145, 121, 144, 0.4));
+}
+
+.pdf-icon-badge {
+  width: 72px;
+  height: 72px;
+  border-radius: 16px;
+  background: rgba(238, 118, 107, 0.15);
+  border: 1px solid rgba(238, 118, 107, 0.35);
+  color: var(--clr-coral);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 20px rgba(238, 118, 107, 0.15);
+  transition: var(--transition-smooth);
+}
+
+.gallery-item:hover .pdf-icon-badge {
+  transform: scale(1.08) translateY(-2px);
+  background: rgba(238, 118, 107, 0.25);
+  box-shadow: 0 6px 24px rgba(238, 118, 107, 0.3);
+}
+
+.pdf-preview-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.pdf-preview-title {
+  font-family: var(--font-header);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--clr-peach-cream);
+  max-width: 220px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pdf-preview-hint {
+  font-size: 0.78rem;
+  color: var(--clr-rose-gold);
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+
+.detail-pdf-viewer {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 10px;
+  overflow: hidden;
+  padding: 0.5rem;
+  border: 1px solid var(--clr-border);
+}
+
+.pdf-iframe {
+  width: 100%;
+  height: 480px;
+  border: none;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+@media (max-width: 768px) {
+  .pdf-iframe {
+    height: 350px;
+  }
+}
+
+

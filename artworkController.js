@@ -86,7 +86,15 @@ const createArtwork = async (req, res) => {
     return res.status(400).json({ error: 'title, art_type, and media_url (or file upload) are required' });
   }
 
-  const validTypes = ['Digital Art', 'Manual Art (Photoed)', 'Video Art', 'Photography'];
+  const validTypes = [
+    'Digital Art',
+    'Manual Art (Photoed)',
+    'Traditional Art',
+    'Video Art',
+    'Photography',
+    'Karya Sastra',
+    'Others'
+  ];
   if (!validTypes.includes(art_type)) {
     return res.status(400).json({ error: `Invalid art_type. Must be one of: ${validTypes.join(', ')}` });
   }
@@ -135,7 +143,15 @@ const updateArtwork = async (req, res) => {
     return res.status(400).json({ error: 'title and art_type are required' });
   }
 
-  const validTypes = ['Digital Art', 'Manual Art (Photoed)', 'Video Art', 'Photography'];
+  const validTypes = [
+    'Digital Art',
+    'Manual Art (Photoed)',
+    'Traditional Art',
+    'Video Art',
+    'Photography',
+    'Karya Sastra',
+    'Others'
+  ];
   if (!validTypes.includes(art_type)) {
     if (req.file) {
       await deleteLocalFile(`/uploads/${req.file.filename}`);

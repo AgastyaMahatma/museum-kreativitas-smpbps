@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Artist Portfolio Manager | Student Art Museum</title>
+  <title>Artist Portfolio Manager | BPS Art Museum</title>
   
   <!-- Stylesheet -->
   <link rel="stylesheet" href="style.css">
@@ -62,9 +62,12 @@
             <label for="artType">Medium</label>
             <select id="artType" class="form-input" style="appearance: none; background-image: url('data:image/svg+xml;utf8,<svg fill=%22%23F7E5DA%22 height=%2224%22 viewBox=%220 0 24 24%22 width=%2224%22 xmlns=%22http://www.w3.org/2000/svg%22><path d=%22M7 10l5 5 5-5z%22/></svg>'); background-repeat: no-repeat; background-position: right 10px center;" required>
               <option value="Digital Art">Digital Art</option>
+              <option value="Traditional Art">Traditional Art</option>
               <option value="Manual Art (Photoed)">Manual Art (Photoed)</option>
-              <option value="Video Art">Video Art</option>
+              <option value="Karya Sastra">Karya Sastra</option>
               <option value="Photography">Photography</option>
+              <option value="Video Art">Video Art</option>
+              <option value="Others">Others</option>
             </select>
           </div>
           <div class="form-group">
@@ -75,9 +78,9 @@
             </select>
           </div>
           <div class="form-group" id="fileUploadGroup">
-            <label for="mediaFile">Select Image or Video File</label>
-            <input type="file" id="mediaFile" name="mediaFile" class="form-input" accept="image/*,video/mp4" required>
-            <small style="color: var(--clr-lavender); font-size: 0.75rem; margin-top: 0.25rem; display: block;">Supported: JPEG, PNG, WEBP, MP4 (Max 50MB).</small>
+            <label for="mediaFile">Select File (Image, Video, or Document/PDF)</label>
+            <input type="file" id="mediaFile" name="mediaFile" class="form-input" accept="image/*,video/mp4,video/quicktime,video/webm,application/pdf,.pdf,.heic,.heif" required>
+            <small style="color: var(--clr-lavender); font-size: 0.75rem; margin-top: 0.25rem; display: block;">Supported: JPG, PNG, WEBP, HEIC, PDF, MP4 (Max 50MB).</small>
           </div>
           <div class="form-group" id="urlUploadGroup" style="display: none;">
             <label for="mediaUrl">Media Source URL</label>
@@ -113,9 +116,12 @@
             <label for="editArtType">Medium</label>
             <select id="editArtType" class="form-input" style="appearance: none; background-image: url('data:image/svg+xml;utf8,<svg fill=%22%23F7E5DA%22 height=%2224%22 viewBox=%220 0 24 24%22 width=%2224%22 xmlns=%22http://www.w3.org/2000/svg%22><path d=%22M7 10l5 5 5-5z%22/></svg>'); background-repeat: no-repeat; background-position: right 10px center;" required>
               <option value="Digital Art">Digital Art</option>
+              <option value="Traditional Art">Traditional Art</option>
               <option value="Manual Art (Photoed)">Manual Art (Photoed)</option>
-              <option value="Video Art">Video Art</option>
+              <option value="Karya Sastra">Karya Sastra</option>
               <option value="Photography">Photography</option>
+              <option value="Video Art">Video Art</option>
+              <option value="Others">Others</option>
             </select>
           </div>
           <div class="form-group">
@@ -131,9 +137,9 @@
             </select>
           </div>
           <div class="form-group" id="editFileGroup" style="display: none;">
-            <label for="editMediaFile">Select New Image/Video File</label>
-            <input type="file" id="editMediaFile" name="mediaFile" class="form-input" accept="image/*,video/mp4">
-            <small style="color: var(--clr-lavender); font-size: 0.75rem; margin-top: 0.25rem; display: block;">Supported: JPEG, PNG, WEBP, MP4 (Max 50MB).</small>
+            <label for="editMediaFile">Select New File (Image, Video, or Document/PDF)</label>
+            <input type="file" id="editMediaFile" name="mediaFile" class="form-input" accept="image/*,video/mp4,video/quicktime,video/webm,application/pdf,.pdf,.heic,.heif">
+            <small style="color: var(--clr-lavender); font-size: 0.75rem; margin-top: 0.25rem; display: block;">Supported: JPG, PNG, WEBP, HEIC, PDF, MP4 (Max 50MB).</small>
           </div>
           <div class="form-group" id="editUrlGroup" style="display: none;">
             <label for="editMediaUrl">New Media Source URL</label>
@@ -173,7 +179,7 @@
     <div class="footer-container">
       <p class="footer-credit">Created by <span>Agastya Mahatma</span></p>
       <p class="footer-team">Managed & Operated by <span>Gung Wah</span>, <span>Kirana Aquilla</span>, <span>Dayu Wika</span>, and <span>Omang Alia</span></p>
-      <p class="footer-copyright">&copy; 2026 Student Art Museum. All rights reserved.</p>
+      <p class="footer-copyright">&copy; 2026 BPS Art Museum. All rights reserved.</p>
     </div>
   </footer>
 

@@ -111,13 +111,35 @@ document.addEventListener('DOMContentLoaded', () => {
       const card = document.createElement('div');
       card.className = 'gallery-item';
       
-      const isVideo = art.art_type === 'Video Art';
-      const mediaHtml = isVideo
-        ? `<video src="${art.media_url}" loop muted playsinline></video>
+      let mediaSrc = art.media_url || '';
+      if (mediaSrc && !mediaSrc.startsWith('http') && !mediaSrc.startsWith('data:')) {
+        if (!mediaSrc.startsWith('/')) {
+          mediaSrc = '/' + mediaSrc;
+        }
+      }
+
+      const isVideo = art.art_type === 'Video Art' || mediaSrc.endsWith('.mp4') || mediaSrc.startsWith('data:video/');
+      const isPdf = mediaSrc.startsWith('data:application/pdf') || mediaSrc.toLowerCase().includes('.pdf') || (art.art_type === 'Karya Sastra' && (mediaSrc.includes('drive.google.com') || mediaSrc.includes('docs.google.com')));
+
+      let mediaHtml = '';
+      if (isVideo) {
+        mediaHtml = `<video src="${escapeHtml(mediaSrc)}" loop muted playsinline></video>
            <div class="video-indicator">
              <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-           </div>`
-        : `<img src="${art.media_url}" alt="${art.title}" loading="lazy">`;
+           </div>`;
+      } else if (isPdf) {
+        mediaHtml = `<div class="pdf-card-preview">
+           <div class="pdf-icon-badge">
+             <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+           </div>
+           <div class="pdf-preview-text">
+             <span class="pdf-preview-title">${escapeHtml(art.title)}</span>
+             <span class="pdf-preview-hint">📄 Dokumen Sastra (PDF)</span>
+           </div>
+         </div>`;
+      } else {
+        mediaHtml = `<img src="${escapeHtml(mediaSrc)}" alt="${escapeHtml(art.title)}" loading="lazy" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800';">`;
+      }
 
       card.innerHTML = `
         <div class="artwork-media-container">

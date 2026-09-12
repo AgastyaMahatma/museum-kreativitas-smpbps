@@ -15,6 +15,42 @@ const generateUuid = () => {
   });
 };
 
+const LEGACY_POSTGRES_TYPES = ['Digital Art', 'Manual Art (Photoed)', 'Video Art', 'Photography'];
+
+const encodeArtTypeForDb = (artType, description = '') => {
+  if (LEGACY_POSTGRES_TYPES.includes(artType)) {
+    return { dbArtType: artType, dbDescription: description || '' };
+  }
+  
+  let fallbackType = 'Digital Art';
+  if (artType === 'Traditional Art') fallbackType = 'Manual Art (Photoed)';
+  else if (artType === 'Video Art') fallbackType = 'Video Art';
+  else if (artType === 'Photography') fallbackType = 'Photography';
+  
+  const encodedDesc = `[ART_TYPE:${artType}]` + (description || '');
+  return { dbArtType: fallbackType, dbDescription: encodedDesc };
+};
+
+const decodeArtworkFromDb = (artwork) => {
+  if (!artwork) return artwork;
+  let artType = artwork.art_type;
+  let description = artwork.description || '';
+
+  if (description.startsWith('[ART_TYPE:')) {
+    const endIdx = description.indexOf(']');
+    if (endIdx !== -1) {
+      artType = description.substring('[ART_TYPE:'.length, endIdx);
+      description = description.substring(endIdx + 1);
+    }
+  }
+
+  return {
+    ...artwork,
+    art_type: artType,
+    description: description
+  };
+};
+
 const initDb = async () => {
   console.log('Connecting to Supabase Database...');
   try {
@@ -133,13 +169,16 @@ const query = async (sql, params = []) => {
     if (error) {
       // Fallback query without relational join
       const { data: plainData } = await supabase.from('artworks').select('*');
-      return plainData || [];
+      return (plainData || []).map(a => decodeArtworkFromDb(a));
     }
 
-    return (data || []).map(a => ({
-      ...a,
-      artist_name: a.users ? a.users.artist_name : 'Unknown Artist'
-    }));
+    return (data || []).map(a => {
+      const decoded = decodeArtworkFromDb(a);
+      return {
+        ...decoded,
+        artist_name: a.users ? a.users.artist_name : 'Unknown Artist'
+      };
+    });
   }
 
   // GUEST LIKES QUERIES
@@ -189,19 +228,20 @@ const run = async (sql, params = []) => {
 
   // INSERT INTO artworks
   if (sqlLower.includes('insert into artworks')) {
+    const { dbArtType, dbDescription } = encodeArtTypeForDb(params[2], params[3]);
     const { data, error } = await supabase.from('artworks').insert([
       {
         artist_id: params[0],
         title: params[1],
-        art_type: params[2],
-        description: params[3] || '',
+        art_type: dbArtType,
+        description: dbDescription,
         media_url: params[4],
         likes_count: 0
       }
     ]).select();
 
     if (error) throw error;
-    const insertedArt = data[0];
+    const insertedArt = decodeArtworkFromDb(data[0]);
     return { id: insertedArt.id, changes: 1 };
   }
 
@@ -220,19 +260,21 @@ const run = async (sql, params = []) => {
       if (error) throw error;
       return { changes: 1 };
     } else if (sqlLower.includes('set title = ?, art_type = ?, description = ?, media_url = ? where id = ? and artist_id = ?')) {
+      const { dbArtType, dbDescription } = encodeArtTypeForDb(params[1], params[2]);
       const { error } = await supabase.from('artworks').update({
         title: params[0],
-        art_type: params[1],
-        description: params[2],
+        art_type: dbArtType,
+        description: dbDescription,
         media_url: params[3]
       }).eq('id', params[4]).eq('artist_id', params[5]);
       if (error) throw error;
       return { changes: 1 };
     } else if (sqlLower.includes('set title = ?, art_type = ?, description = ?, media_url = ? where id = ?')) {
+      const { dbArtType, dbDescription } = encodeArtTypeForDb(params[1], params[2]);
       const { error } = await supabase.from('artworks').update({
         title: params[0],
-        art_type: params[1],
-        description: params[2],
+        art_type: dbArtType,
+        description: dbDescription,
         media_url: params[3]
       }).eq('id', params[4]);
       if (error) throw error;

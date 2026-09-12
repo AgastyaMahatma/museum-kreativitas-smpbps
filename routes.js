@@ -10,13 +10,31 @@ const adminController = require('./adminController');
 // Multer memory storage configuration for Serverless / Vercel compatibility
 const storage = multer.memoryStorage();
 
-// File filter (restrict to JPEG, PNG, WEBP, MP4)
+// File filter (supports PDF, HEIC, JPG, PNG, WEBP, MP4, WEBM, MOV)
 const fileFilter = (req, file, cb) => {
-  const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp', 'video/mp4'];
-  if (allowedMimeTypes.includes(file.mimetype)) {
+  const allowedMimeTypes = [
+    'image/jpeg',
+    'image/jpg',
+    'image/png',
+    'image/webp',
+    'image/heic',
+    'image/heif',
+    'image/heic-sequence',
+    'image/heif-sequence',
+    'application/pdf',
+    'application/x-pdf',
+    'video/mp4',
+    'video/webm',
+    'video/quicktime'
+  ];
+
+  const ext = path.extname(file.originalname || '').toLowerCase();
+  const allowedExtensions = ['.jpg', '.jpeg', '.png', '.webp', '.heic', '.heif', '.pdf', '.mp4', '.webm', '.mov'];
+
+  if (allowedMimeTypes.includes(file.mimetype) || allowedExtensions.includes(ext)) {
     cb(null, true);
   } else {
-    cb(new Error('Invalid file type. Only JPEG, PNG, WEBP, and MP4 are allowed.'), false);
+    cb(new Error('Invalid file type. Allowed formats: PDF, PNG, JPG/JPEG, HEIC, WEBP, MP4.'), false);
   }
 };
 

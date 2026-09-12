@@ -235,6 +235,67 @@ const runTests = async () => {
       throw new Error('Owner failed to delete artwork!');
     }
 
+    // 9b. Test Uploads with New Art Types: Traditional Art, Karya Sastra, Others
+    console.log('\nTesting Uploads with New Art Types (Traditional Art, Karya Sastra, Others)...');
+    
+    // Traditional Art
+    const tradArtRes = await fetch(`${BASE_URL}/artworks`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Cookie': artistCookies },
+      body: JSON.stringify({
+        title: 'Batik & Wayang Heritage',
+        art_type: 'Traditional Art',
+        description: 'Handcrafted traditional ink art.',
+        media_url: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=800'
+      })
+    });
+    const tradArtData = await tradArtRes.json();
+    console.log('Create Traditional Art Status:', tradArtRes.status);
+    if (tradArtRes.status !== 201 || tradArtData.artwork?.art_type !== 'Traditional Art') {
+      throw new Error('Failed to create Traditional Art!');
+    }
+
+    // Karya Sastra (PDF simulated base64)
+    const sastraRes = await fetch(`${BASE_URL}/artworks`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Cookie': artistCookies },
+      body: JSON.stringify({
+        title: 'Syair Senja di Denpasar',
+        art_type: 'Karya Sastra',
+        description: 'Antologi puisi kontemporer oleh siswa.',
+        media_url: 'data:application/pdf;base64,JVBERi0xLjUKJUZha2VQZGY='
+      })
+    });
+    const sastraData = await sastraRes.json();
+    console.log('Create Karya Sastra Status:', sastraRes.status);
+    if (sastraRes.status !== 201 || sastraData.artwork?.art_type !== 'Karya Sastra') {
+      throw new Error('Failed to create Karya Sastra!');
+    }
+
+    // Others
+    const otherRes = await fetch(`${BASE_URL}/artworks`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Cookie': artistCookies },
+      body: JSON.stringify({
+        title: 'Mixed Media Hologram',
+        art_type: 'Others',
+        description: 'Experimental installation and mixed medium.',
+        media_url: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=800'
+      })
+    });
+    const otherData = await otherRes.json();
+    console.log('Create Others Art Type Status:', otherRes.status);
+    if (otherRes.status !== 201 || otherData.artwork?.art_type !== 'Others') {
+      throw new Error('Failed to create Others art type!');
+    }
+
+    // Clean up created test pieces
+    await db.run('DELETE FROM artworks WHERE id IN (?, ?, ?)', [
+      tradArtData.artwork.id,
+      sastraData.artwork.id,
+      otherData.artwork.id
+    ]);
+
     // 10. Clean up temporary test user
     if (uniqueSignupData?.user?.id) {
       await db.run('DELETE FROM users WHERE id = ?', [uniqueSignupData.user.id]);

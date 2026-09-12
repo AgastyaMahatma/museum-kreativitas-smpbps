@@ -164,12 +164,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     adminArtworks.forEach(art => {
       const row = document.createElement('tr');
-      const isVideo = art.art_type === 'Video Art';
-      const mediaPreview = isVideo
-        ? `<div style="width: 50px; height: 50px; background: #000; border-radius: 6px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--clr-border);">
+      const isVideo = art.art_type === 'Video Art' || (art.media_url && art.media_url.endsWith('.mp4'));
+      const isPdf = art.media_url && (art.media_url.startsWith('data:application/pdf') || art.media_url.toLowerCase().includes('.pdf') || art.art_type === 'Karya Sastra');
+
+      let mediaPreview = '';
+      if (isVideo) {
+        mediaPreview = `<div style="width: 50px; height: 50px; background: #000; border-radius: 6px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--clr-border);">
              <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--clr-peach-cream)"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-           </div>`
-        : `<img src="${art.media_url}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px; border: 1px solid var(--clr-border);">`;
+           </div>`;
+      } else if (isPdf) {
+        mediaPreview = `<div style="width: 50px; height: 50px; background: rgba(145, 121, 144, 0.2); border-radius: 6px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--clr-border);" title="PDF Document">
+             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--clr-coral)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+           </div>`;
+      } else {
+        mediaPreview = `<img src="${art.media_url}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px; border: 1px solid var(--clr-border);" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800';">`;
+      }
 
       row.innerHTML = `
         <td style="padding: 1rem;">${mediaPreview}</td>
